@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyglot Translator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #a18cd1; 
+            --light-purple: #c5b4e3;
+            --dark-bg: #121212;
+            --card-black: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; color: white; }
+
+        body {
+            background: linear-gradient(135deg, #3d414d 0%, #121212 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 15px;
+        }
+
+        .container { width: 100%; max-width: 400px; z-index: 1; text-align: center; }
+
+        /* ROBOT AND SLOW BLINK TEXT */
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bot-logo {
+            font-size: 3.5rem;
+            color: #333; 
+            transition: all 0.6s ease;
+            z-index: 2;
+        }
+
+        /* Light purple glow when ON */
+        .bot-logo.active {
+            color: var(--light-purple);
+            filter: drop-shadow(0 0 15px var(--primary-purple));
+        }
+
+        /* SLOW BLINK animation */
+        .click-here {
+            font-size: 0.9rem;
+            color: #777;
+            animation: slowBlink 3s linear infinite; /* Slowed down to 3 seconds */
+        }
+
+        @keyframes slowBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.1; }
+        }
+
+        /* LIGHT REFLECTION ON TRANSLATOR */
+        #translator-app {
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.5s ease;
+            position: relative;
+            border-radius: 35px;
+        }
+
+        /* The Purple Glow Reflection */
+        #translator-app.glow-on {
+            box-shadow: 0 -20px 50px -10px rgba(161, 140, 209, 0.4); /* Reflection hitting the top */
+        }
+
+        .main-card {
+            background: var(--card-black);
+            border-radius: 35px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Language Section */
+        .lang-section { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        select {
+            width: 85%; padding: 12px; border-radius: 12px;
+            background: #1a1a1a; border: 1px solid #333;
+            text-align: center; font-size: 1rem; outline: none;
+        }
+        .swap-btn { font-size: 1.2rem; margin: 5px 0; cursor: pointer; color: #888; }
+
+        /* Gender Switch */
+        .gender-toggle {
+            display: flex; background: #1a1a1a; padding: 5px;
+            border-radius: 15px; border: 1px solid #333; margin: 20px 0;
+            justify-content: center;
+        }
+        .v-opt { padding: 10px 25px; cursor: pointer; border-radius: 12px; font-size: 0.9rem; color: #888; }
+        .v-opt.active { background: var(--primary-purple); color: #000; font-weight: 600; }
+
+        /* Boxes */
+        .text-wrap { width: 100%; background: #0a0a0a; border-radius: 20px; border: 1px solid #222; margin-bottom: 15px; text-align: left; }
+        textarea { width: 100%; height: 120px; padding: 15px; border: none; background: transparent; resize: none; font-size: 1rem; outline: none; }
+        .box-footer { display: flex; justify-content: space-between; padding: 10px 15px; background: rgba(255,255,255,0.03); border-radius: 0 0 20px 20px; }
+
+        .action-button {
+            width: 100%; background: var(--primary-purple); color: #000; border: none;
+            padding: 16px; border-radius: 15px; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section" onclick="toggleApp()">
+        <i class="fas fa-robot bot-logo" id="robotIcon"></i>
+        <span class="click-here" id="clickText">click here</span>
+    </div>
+
+    <div id="translator-app">
+        <div class="main-card">
+            <div class="lang-section">
+                <select id="langFrom">
+                    <option value="en-US">English</option>
+                    <option value="hi-IN">Hindi</option>
+                    <option value="gu-IN">Gujarati</option>
+                    <option value="te-IN">Telugu</option>
+                    <option value="ta-IN">Tamil</option>
+                    <option value="ko-KR">Korean</option>
+                    <option value="ja-JP">Japanese</option>
+                </select>
+                <i class="fas fa-exchange-alt swap-btn" onclick="swapLangs()"></i>
+                <select id="langTo">
+                    <option value="gu-IN">Gujarati</option>
+                    <option value="hi-IN">Hindi</option>
+                    <option value="en-US">English</option>
+                    <option value="te-IN">Telugu</option>
+                    <option value="ta-IN">Tamil</option>
+                    <option value="ko-KR">Korean</option>
+                    <option value="ja-JP">Japanese</option>
+                </select>
+            </div>
+
+            <div class="gender-toggle">
+                <div class="v-opt active" id="fToggle">Female</div>
+                <div class="v-opt" id="mToggle">Male</div>
+            </div>
+
+            <div class="text-wrap">
+                <textarea id="inputText" placeholder="Type message..."></textarea>
+                <div class="box-footer">
+                    <i class="fas fa-volume-up" onclick="speakNow('input')"></i>
+                    <span style="font-size: 0.7rem; color: #555;">Input</span>
+                </div>
+            </div>
+
+            <div class="text-wrap">
+                <textarea id="outputText" readonly placeholder="Translation..."></textarea>
+                <div class="box-footer">
+                    <i class="fas fa-volume-up" onclick="speakNow('output')"></i>
+                    <i class="fas fa-copy" onclick="copyText()"></i>
+                </div>
+            </div>
+
+            <button class="action-button" onclick="translateProcess()">TRANSLATE & SPEAK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentGender = 'female';
+    const synth = window.speechSynthesis;
+
+    function toggleApp() {
+        const app = document.getElementById('translator-app');
+        const robot = document.getElementById('robotIcon');
+        const clickText = document.getElementById('clickText');
+
+        if (app.style.display === "none" || app.style.display === "") {
+            app.style.display = "flex"; 
+            setTimeout(() => { 
+                robot.classList.add('active'); 
+                app.classList.add('glow-on'); // Apply light reflection
+            }, 10);
+            clickText.style.display = "none";
+        } else {
+            app.style.display = "none"; 
+            robot.classList.remove('active'); 
+            app.classList.remove('glow-on');
+            clickText.style.display = "inline";
+        }
+    }
+
+    document.getElementById('fToggle').onclick = (e) => {
+        e.stopPropagation();
+        currentGender = 'female';
+        document.getElementById('fToggle').classList.add('active');
+        document.getElementById('mToggle').classList.remove('active');
+    };
+    document.getElementById('mToggle').onclick = (e) => {
+        e.stopPropagation();
+        currentGender = 'male';
+        document.getElementById('mToggle').classList.add('active');
+        document.getElementById('fToggle').classList.remove('active');
+    };
+
+    function swapLangs() {
+        const from = document.getElementById('langFrom');
+        const to = document.getElementById('langTo');
+        const temp = from.value;
+        from.value = to.value;
+        to.value = temp;
+    }
+
+    async function translateProcess() {
+        const text = document.getElementById('inputText').value;
+        if(!text) return;
+        const sl = document.getElementById('langFrom').value.split('-')[0];
+        const tl = document.getElementById('langTo').value.split('-')[0];
+
+        try {
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`);
+            const data = await res.json();
+            const result = data[0].map(x => x[0]).join('');
+            document.getElementById('outputText').value = result;
+            speakNow('output');
+        } catch(e) { alert("Error"); }
+    }
+
+    function speakNow(type) {
+        const text = (type === 'input') ? document.getElementById('inputText').value : document.getElementById('outputText').value;
+        const lang = (type === 'input') ? document.getElementById('langFrom').value : document.getElementById('langTo').value;
+        if(!text) return;
+        synth.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        utterance.pitch = (currentGender === 'female') ? 1.4 : 0.5;
+        utterance.rate = (currentGender === 'female') ? 1.0 : 0.85;
+        synth.speak(utterance);
+    }
+
+    function copyText() {
+        const out = document.getElementById('outputText');
+        navigator.clipboard.writeText(out.value);
+        alert("Copied!");
+    }
+</script>
+</body>
+</html>
