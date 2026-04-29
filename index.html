@@ -25,55 +25,28 @@
 
         .container { width: 100%; max-width: 400px; z-index: 1; text-align: center; }
 
-        /* ROBOT AND SLOW BLINK TEXT */
+        /* STATIC ROBOT LOGO */
         .header-section {
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
-            gap: 15px;
-            cursor: pointer;
-            position: relative;
         }
 
         .bot-logo {
             font-size: 3.5rem;
-            color: #333; 
-            transition: all 0.6s ease;
-            z-index: 2;
-        }
-
-        /* Light purple glow when ON */
-        .bot-logo.active {
             color: var(--light-purple);
             filter: drop-shadow(0 0 15px var(--primary-purple));
         }
 
-        /* SLOW BLINK animation */
-        .click-here {
-            font-size: 0.9rem;
-            color: #777;
-            animation: slowBlink 3s linear infinite; /* Slowed down to 3 seconds */
-        }
-
-        @keyframes slowBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.1; }
-        }
-
-        /* LIGHT REFLECTION ON TRANSLATOR */
+        /* ALWAYS VISIBLE APP */
         #translator-app {
-            display: none; 
+            display: flex; 
             flex-direction: column;
             align-items: center;
-            transition: all 0.5s ease;
             position: relative;
             border-radius: 35px;
-        }
-
-        /* The Purple Glow Reflection */
-        #translator-app.glow-on {
-            box-shadow: 0 -20px 50px -10px rgba(161, 140, 209, 0.4); /* Reflection hitting the top */
+            box-shadow: 0 -20px 50px -10px rgba(161, 140, 209, 0.4); /* Permanent Reflection */
         }
 
         .main-card {
@@ -119,9 +92,8 @@
 <body>
 
 <div class="container">
-    <div class="header-section" onclick="toggleApp()">
-        <i class="fas fa-robot bot-logo" id="robotIcon"></i>
-        <span class="click-here" id="clickText">click here</span>
+    <div class="header-section">
+        <i class="fas fa-robot bot-logo"></i>
     </div>
 
     <div id="translator-app">
@@ -178,34 +150,14 @@
     let currentGender = 'female';
     const synth = window.speechSynthesis;
 
-    function toggleApp() {
-        const app = document.getElementById('translator-app');
-        const robot = document.getElementById('robotIcon');
-        const clickText = document.getElementById('clickText');
+    // Toggle logic removed as requested - UI is now static
 
-        if (app.style.display === "none" || app.style.display === "") {
-            app.style.display = "flex"; 
-            setTimeout(() => { 
-                robot.classList.add('active'); 
-                app.classList.add('glow-on'); // Apply light reflection
-            }, 10);
-            clickText.style.display = "none";
-        } else {
-            app.style.display = "none"; 
-            robot.classList.remove('active'); 
-            app.classList.remove('glow-on');
-            clickText.style.display = "inline";
-        }
-    }
-
-    document.getElementById('fToggle').onclick = (e) => {
-        e.stopPropagation();
+    document.getElementById('fToggle').onclick = () => {
         currentGender = 'female';
         document.getElementById('fToggle').classList.add('active');
         document.getElementById('mToggle').classList.remove('active');
     };
-    document.getElementById('mToggle').onclick = (e) => {
-        e.stopPropagation();
+    document.getElementById('mToggle').onclick = () => {
         currentGender = 'male';
         document.getElementById('mToggle').classList.add('active');
         document.getElementById('fToggle').classList.remove('active');
@@ -231,7 +183,7 @@
             const result = data[0].map(x => x[0]).join('');
             document.getElementById('outputText').value = result;
             speakNow('output');
-        } catch(e) { alert("Error"); }
+        } catch(e) { alert("Error connecting to translation service."); }
     }
 
     function speakNow(type) {
@@ -241,6 +193,7 @@
         synth.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = lang;
+        // Pitch/Rate adjustments for gender effect
         utterance.pitch = (currentGender === 'female') ? 1.4 : 0.5;
         utterance.rate = (currentGender === 'female') ? 1.0 : 0.85;
         synth.speak(utterance);
@@ -248,6 +201,7 @@
 
     function copyText() {
         const out = document.getElementById('outputText');
+        if(!out.value) return;
         navigator.clipboard.writeText(out.value);
         alert("Copied!");
     }
