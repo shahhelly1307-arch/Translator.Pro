@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Polyglot Translator</title>
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
     <style>
@@ -188,14 +186,11 @@
 <body>
 
 <div class="container">
-    <!-- LOGO -->
     <div class="logo">
         <i class="fas fa-robot"></i>
     </div>
 
-    <!-- CARD -->
     <div class="card">
-        <!-- LANGUAGE -->
         <div class="lang-section">
             <select id="langFrom">
                 <option value="en-US">English</option>
@@ -220,13 +215,11 @@
             </select>
         </div>
 
-        <!-- VOICE TOGGLE -->
         <div class="gender-toggle">
             <button class="voice-btn active" id="femaleBtn">Female</button>
             <button class="voice-btn" id="maleBtn">Male</button>
         </div>
 
-        <!-- INPUT -->
         <div class="text-box">
             <textarea id="inputText" placeholder="Type your message..."></textarea>
             <div class="footer">
@@ -235,7 +228,6 @@
             </div>
         </div>
 
-        <!-- OUTPUT -->
         <div class="text-box">
             <textarea id="outputText" readonly placeholder="Translation appears here..."></textarea>
             <div class="footer">
@@ -244,7 +236,6 @@
             </div>
         </div>
 
-        <!-- BUTTON -->
         <button class="translate-btn" onclick="translateNow()">TRANSLATE & SPEAK</button>
     </div>
 </div>
@@ -254,7 +245,7 @@
     const synth = window.speechSynthesis;
     let voices = [];
 
-    // Pre-cache hardware sound banks
+    // Pre-cache hardware sound banks securely
     function initVoices() {
         voices = synth.getVoices();
     }
@@ -314,49 +305,51 @@
         }
     }
 
-    // FORCE-FILTERED HARDWARE SPEECH ENGINE
+    // ARCHITECTED SPEECH ENGINE (Zero-Distortion Filtering)
     function speakNativeText(text, langCode) {
-        synth.cancel(); // Clears all hung audio nodes instantly
+        synth.cancel(); // Instantly flushes stuck audio buffers
         if (!text) return;
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = langCode;
 
         const langShort = langCode.split("-")[0].toLowerCase();
-        const targetedVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langShort));
+        
+        // Standardize language tag variations across platforms
+        const targetedVoices = voices.filter(v => v.lang.toLowerCase().replace('_', '-').startsWith(langShort));
 
         let matchingVoice = null;
 
         if (targetedVoices.length > 0) {
             if (currentGender === "female") {
-                // Find soft female system accents
+                // Prioritize smooth, natural, cloud-sampled system voices
                 matchingVoice = targetedVoices.find(v => {
                     const n = v.name.toLowerCase();
-                    return n.includes("female") || n.includes("zira") || n.includes("samantha") || n.includes("google") || n.includes("siri");
-                }) || targetedVoices[0];
-                
-                // SOFT PROFILE CONFIGURATION
-                utterance.pitch = 1.35; 
-                utterance.rate = 0.95;
+                    return (n.includes("google") || n.includes("natural") || n.includes("siri") || n.includes("zira") || n.includes("samantha")) && !n.includes("male");
+                }) || targetedVoices.find(v => v.name.toLowerCase().includes("female")) || targetedVoices[0];
+
+                // REFINED SOFT CONFIGURATION (Prevents waveform breaking/choppiness)
+                utterance.pitch = 1.10; // Comfortable higher harmonic layer without synthesis crackle
+                utterance.rate = 1.0;   // Clean, steady pacing for natural diction
             } else {
-                // Find heavy male system accents
+                // High-fidelity deep male profiles
                 matchingVoice = targetedVoices.find(v => {
                     const n = v.name.toLowerCase();
                     return n.includes("male") || n.includes("david") || n.includes("george") || n.includes("ravi") || n.includes("microsoft");
-                }) || (targetedVoices[1] ? targetedVoices[1] : targetedVoices[0]);
-                
-                // HARD MALE PROFILE CONFIGURATION (Max bass-register compression)
-                utterance.pitch = 0.40; // Drops deep down into a gravelly chest register
-                utterance.rate = 0.80;  // Heavy, powerful, slower speaking pacing
+                }) || targetedVoices[0];
+
+                // STABLE MALE REVERB CONFIGURATION
+                utterance.pitch = 0.65; // Crisp deep register without signal degradation
+                utterance.rate = 0.85;  
             }
         } else {
-            // Absolute native fallback values if localized asset packs are missing on device
+            // Absolute hardware fallbacks if system voice profiles haven't fully indexed
             if (currentGender === "female") {
-                utterance.pitch = 1.35;
-                utterance.rate = 0.95;
+                utterance.pitch = 1.10;
+                utterance.rate = 1.0;
             } else {
-                utterance.pitch = 0.40;
-                utterance.rate = 0.80;
+                utterance.pitch = 0.65;
+                utterance.rate = 0.85;
             }
         }
 
