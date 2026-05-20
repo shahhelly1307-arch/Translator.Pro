@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Polyglot Translator</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+    <style>
+        :root {
+            --primary: #a18cd1;
+            --light: #c5b4e3;
+            --dark: #121212;
+            --card: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3d414d 0%, #121212 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo i {
+            font-size: 4rem;
+            color: var(--light);
+            filter: drop-shadow(0 0 15px var(--primary));
+        }
+
+        .card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(161, 140, 209, 0.15);
+        }
+
+        /* LANGUAGE */
+        .lang-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 85%;
+            padding: 12px;
+            border: none;
+            outline: none;
+            border-radius: 14px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .swap-btn {
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #999;
+            transition: 0.4s;
+        }
+
+        .swap-btn:hover {
+            color: white;
+            transform: rotate(180deg);
+        }
+
+        /* VOICE TOGGLE */
+        .gender-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .voice-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 14px;
+            background: #1a1a1a;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .voice-btn.active {
+            background: var(--primary);
+            color: black;
+            font-weight: 700;
+        }
+
+        /* TEXT AREA */
+        .text-box {
+            background: #0a0a0a;
+            border-radius: 20px;
+            border: 1px solid #222;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            color: white;
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        /* FOOTER */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .footer i {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .footer i:hover {
+            color: var(--light);
+            transform: scale(1.1);
+        }
+
+        /* BUTTON */
+        .translate-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: var(--primary);
+            color: black;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .translate-btn:hover {
+            background: #b89dec;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- LOGO -->
+    <div class="logo">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- CARD -->
+    <div class="card">
+        <!-- LANGUAGE -->
+        <div class="lang-section">
+            <select id="langFrom">
+                <option value="en-US">English</option>
+                <option value="hi-IN">Hindi</option>
+                <option value="gu-IN">Gujarati</option>
+                <option value="ta-IN">Tamil</option>
+                <option value="te-IN">Telugu</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+            </select>
+
+            <i class="fas fa-exchange-alt swap-btn" onclick="swapLangs()"></i>
+
+            <select id="langTo">
+                <option value="hi-IN">Hindi</option>
+                <option value="en-US">English</option>
+                <option value="gu-IN">Gujarati</option>
+                <option value="ta-IN">Tamil</option>
+                <option value="te-IN">Telugu</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ja-JP">Japanese</option>
+            </select>
+        </div>
+
+        <!-- VOICE TOGGLE -->
+        <div class="gender-toggle">
+            <button class="voice-btn active" id="femaleBtn">Female</button>
+            <button class="voice-btn" id="maleBtn">Male</button>
+        </div>
+
+        <!-- INPUT -->
+        <div class="text-box">
+            <textarea id="inputText" placeholder="Type your message..."></textarea>
+            <div class="footer">
+                <i class="fas fa-volume-up" onclick="speakInput()"></i>
+                <span style="font-size: 0.75rem; color: #666;">Input</span>
+            </div>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="text-box">
+            <textarea id="outputText" readonly placeholder="Translation appears here..."></textarea>
+            <div class="footer">
+                <i class="fas fa-volume-up" onclick="speakOutput()"></i>
+                <i class="fas fa-copy" onclick="copyText()"></i>
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="translate-btn" onclick="translateNow()">TRANSLATE & SPEAK</button>
+    </div>
+</div>
+
+<script>
+    let currentGender = "female";
+    const synth = window.speechSynthesis;
+    let voices = [];
+
+    // Pre-cache hardware sound banks
+    function initVoices() {
+        voices = synth.getVoices();
+    }
+    initVoices();
+    if (synth.onvoiceschanged !== undefined) {
+        synth.onvoiceschanged = initVoices;
+    }
+
+    // GENDER BUTTON SELECTIONS
+    document.getElementById("femaleBtn").onclick = function() {
+        currentGender = "female";
+        this.classList.add("active");
+        document.getElementById("maleBtn").classList.remove("active");
+    };
+
+    document.getElementById("maleBtn").onclick = function() {
+        currentGender = "male";
+        this.classList.add("active");
+        document.getElementById("femaleBtn").classList.remove("active");
+    };
+
+    // SWAP LANGUAGES
+    function swapLangs() {
+        const from = document.getElementById("langFrom");
+        const to = document.getElementById("langTo");
+        let temp = from.value;
+        from.value = to.value;
+        to.value = temp;
+    }
+
+    // TRANSLATE FUNCTION
+    async function translateNow() {
+        const text = document.getElementById("inputText").value.trim();
+        if (!text) {
+            alert("Please enter text");
+            return;
+        }
+
+        const sl = document.getElementById("langFrom").value.split("-")[0];
+        const tl = document.getElementById("langTo").value.split("-")[0];
+
+        try {
+            const response = await fetch(
+                `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`
+            );
+            const data = await response.json();
+            const translated = data[0].map(item => item[0]).join("");
+
+            document.getElementById("outputText").value = translated;
+
+            // Trigger instant sound output
+            speakNativeText(translated, document.getElementById("langTo").value);
+
+        } catch (error) {
+            console.error(error);
+            alert("Translation failed");
+        }
+    }
+
+    // FORCE-FILTERED HARDWARE SPEECH ENGINE
+    function speakNativeText(text, langCode) {
+        synth.cancel(); // Clears all hung audio nodes instantly
+        if (!text) return;
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = langCode;
+
+        const langShort = langCode.split("-")[0].toLowerCase();
+        const targetedVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langShort));
+
+        let matchingVoice = null;
+
+        if (targetedVoices.length > 0) {
+            if (currentGender === "female") {
+                // Find soft female system accents
+                matchingVoice = targetedVoices.find(v => {
+                    const n = v.name.toLowerCase();
+                    return n.includes("female") || n.includes("zira") || n.includes("samantha") || n.includes("google") || n.includes("siri");
+                }) || targetedVoices[0];
+                
+                // SOFT PROFILE CONFIGURATION
+                utterance.pitch = 1.35; 
+                utterance.rate = 0.95;
+            } else {
+                // Find heavy male system accents
+                matchingVoice = targetedVoices.find(v => {
+                    const n = v.name.toLowerCase();
+                    return n.includes("male") || n.includes("david") || n.includes("george") || n.includes("ravi") || n.includes("microsoft");
+                }) || (targetedVoices[1] ? targetedVoices[1] : targetedVoices[0]);
+                
+                // HARD MALE PROFILE CONFIGURATION (Max bass-register compression)
+                utterance.pitch = 0.40; // Drops deep down into a gravelly chest register
+                utterance.rate = 0.80;  // Heavy, powerful, slower speaking pacing
+            }
+        } else {
+            // Absolute native fallback values if localized asset packs are missing on device
+            if (currentGender === "female") {
+                utterance.pitch = 1.35;
+                utterance.rate = 0.95;
+            } else {
+                utterance.pitch = 0.40;
+                utterance.rate = 0.80;
+            }
+        }
+
+        if (matchingVoice) {
+            utterance.voice = matchingVoice;
+        }
+
+        synth.speak(utterance);
+    }
+
+    // BUTTON AUDIOS
+    function speakInput() {
+        const text = document.getElementById("inputText").value;
+        const lang = document.getElementById("langFrom").value;
+        speakNativeText(text, lang);
+    }
+
+    function speakOutput() {
+        const text = document.getElementById("outputText").value;
+        const lang = document.getElementById("langTo").value;
+        speakNativeText(text, lang);
+    }
+
+    // COPY FUNCTION
+    function copyText() {
+        const text = document.getElementById("outputText").value;
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        alert("Copied!");
+    }
+</script>
+
+</body>
+</html>
